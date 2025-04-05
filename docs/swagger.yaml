@@ -1,0 +1,222 @@
+basePath: /api
+definitions:
+  entity.User:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  output_schema.UserLoginOutputSchema:
+    properties:
+      token:
+        type: string
+      user:
+        $ref: '#/definitions/entity.User'
+    type: object
+  request.LoginRequest:
+    properties:
+      email:
+        example: user@example.com
+        type: string
+      password:
+        example: password123
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  request.RegisterRequest:
+    properties:
+      email:
+        example: user@example.com
+        type: string
+      password:
+        example: password123
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  response.GetMeResponse:
+    properties:
+      errorSchema:
+        $ref: '#/definitions/schema.ErrorSchema'
+      outputSchema:
+        $ref: '#/definitions/entity.User'
+    type: object
+  response.LoginResponse:
+    properties:
+      errorSchema:
+        $ref: '#/definitions/schema.ErrorSchema'
+      outputSchema:
+        $ref: '#/definitions/output_schema.UserLoginOutputSchema'
+    type: object
+  response.LogoutResponse:
+    properties:
+      errorSchema:
+        $ref: '#/definitions/schema.ErrorSchema'
+    type: object
+  response.RegisterResponse:
+    properties:
+      errorSchema:
+        $ref: '#/definitions/schema.ErrorSchema'
+      outputSchema:
+        $ref: '#/definitions/entity.User'
+    type: object
+  schema.ErrorMessage:
+    properties:
+      english:
+        type: string
+      indonesian:
+        type: string
+    type: object
+  schema.ErrorSchema:
+    properties:
+      errorCode:
+        type: string
+      errorMessage:
+        $ref: '#/definitions/schema.ErrorMessage'
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@example.com
+    name: API Support
+    url: http://www.example.com/support
+  description: A Project Hub Clean Architecture authentication API with PostgreSQL
+    and Gin.
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: http://swagger.io/terms/
+  title: Project Hub Authentication API
+  version: "1.0"
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user and return JWT
+      parameters:
+      - description: Login credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/request.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Login successful
+          schema:
+            $ref: '#/definitions/response.LoginResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/response.LoginResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.LoginResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.LoginResponse'
+      summary: Login user
+      tags:
+      - auth
+  /auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: Invalidate the user's JWT by blacklisting the token
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Logout successful
+          schema:
+            $ref: '#/definitions/response.LogoutResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.LogoutResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.LogoutResponse'
+      security:
+      - BearerAuth: []
+      summary: Logout user
+      tags:
+      - auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user account
+      parameters:
+      - description: User Registration Info
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/request.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User created successfully
+          schema:
+            $ref: '#/definitions/response.RegisterResponse'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/response.RegisterResponse'
+        "409":
+          description: User already exists
+          schema:
+            $ref: '#/definitions/response.RegisterResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.RegisterResponse'
+      summary: Register a new user
+      tags:
+      - auth
+  /users/me:
+    get:
+      description: Get currently authenticated user's info
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/response.GetMeResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.GetMeResponse'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/response.GetMeResponse'
+      security:
+      - BearerAuth: []
+      summary: Get current user
+      tags:
+      - users
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
