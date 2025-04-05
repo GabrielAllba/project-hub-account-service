@@ -62,3 +62,16 @@ func (r *userRepository) Create(user *entity.User) error {
 
 	return nil
 }
+
+func (r *userRepository) Update(user *entity.User) error {
+	query := `
+        UPDATE users 
+        SET email = $1, password = $2, verified_at = $3, updated_at = CURRENT_TIMESTAMP 
+        WHERE id = $4`
+	_, err := r.db.Exec(query, user.Email, user.Password, user.VerifiedAt, user.ID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

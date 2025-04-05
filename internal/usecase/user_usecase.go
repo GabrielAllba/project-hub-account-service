@@ -1,6 +1,8 @@
 package usecase
 
 import (
+	"time"
+
 	"golang.org/x/crypto/bcrypt"
 
 	"project-hub/account-service/internal/domain/entity"
@@ -73,4 +75,19 @@ func (uc *userUseCase) VerifyPassword(email, password string) (*entity.User, err
 	}
 
 	return user, nil
+}
+
+func (uc *userUseCase) VerifyUser(userID uint) error {
+	user, err := uc.userRepo.GetByID(userID)
+	if err != nil {
+		return err
+	}
+	if user == nil {
+		return entity.ErrNotFound
+	}
+
+	now := time.Now()
+	user.VerifiedAt = &now
+
+	return uc.userRepo.Update(user)
 }

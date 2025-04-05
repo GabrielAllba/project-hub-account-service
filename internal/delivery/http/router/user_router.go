@@ -39,5 +39,6 @@ func NewUserRouter(
 	userRoutes.Use(middleware.AuthMiddleware(cfg, userRepo, blacklistedTokenRepo))
 	{
 		userRoutes.GET("/me", userhttp.GetMeHandler(handler))
+		userRoutes.PUT("/verify", userhttp.VerifyUserHandler(handler))
 	}
 }

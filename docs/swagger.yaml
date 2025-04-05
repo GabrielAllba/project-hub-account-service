@@ -10,6 +10,8 @@ definitions:
         type: integer
       updated_at:
         type: string
+      verified_at:
+        type: string
     type: object
   output_schema.UserLoginOutputSchema:
     properties:
@@ -64,6 +66,13 @@ definitions:
   response.RegisterResponse:
     properties:
       errorSchema:
+        $ref: '#/definitions/schema.ErrorSchema'
+      outputSchema:
+        $ref: '#/definitions/entity.User'
+    type: object
+  response.VerifyUserResponse:
+    properties:
+      error_schema:
         $ref: '#/definitions/schema.ErrorSchema'
       outputSchema:
         $ref: '#/definitions/entity.User'
@@ -211,6 +220,31 @@ paths:
       security:
       - BearerAuth: []
       summary: Get current user
+      tags:
+      - users
+  /users/verify:
+    put:
+      consumes:
+      - application/json
+      description: Mark a user as verified
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User verified successfully
+          schema:
+            $ref: '#/definitions/response.VerifyUserResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.VerifyUserResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.VerifyUserResponse'
+      security:
+      - BearerAuth: []
+      summary: Verify a user
       tags:
       - users
 securityDefinitions:

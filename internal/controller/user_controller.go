@@ -18,6 +18,7 @@ type UserController interface {
 	Register(req *dtoreq.RegisterRequest) (userresponse.RegisterResponse, error)
 	Login(req *dtoreq.LoginRequest) (userresponse.LoginResponse, error)
 	Logout(tokenString string) (userresponse.LogoutResponse, error)
+	VerifyUser(userID uint) (userresponse.VerifyUserResponse, error)
 }
 
 type userController struct {
@@ -140,6 +141,35 @@ func (c *userController) Logout(tokenString string) (userresponse.LogoutResponse
 				Indonesian: "Logout berhasil",
 				English:    "Logout successful",
 			},
+		},
+	}, nil
+}
+
+func (c *userController) VerifyUser(userID uint) (userresponse.VerifyUserResponse, error) {
+	err := c.userUseCase.VerifyUser(userID)
+	if err != nil {
+		return userresponse.VerifyUserResponse{}, err
+	}
+
+	verifiedUser, err := c.userUseCase.GetUser(userID)
+	if err != nil {
+		return userresponse.VerifyUserResponse{}, err
+	}
+
+	return userresponse.VerifyUserResponse{
+		ErrorSchema: schema.ErrorSchema{
+			ErrorCode: "00",
+			ErrorMessage: schema.ErrorMessage{
+				Indonesian: "Verifikasi berhasil",
+				English:    "Verification successful",
+			},
+		},
+		OutputSchema: entity.User{
+			ID:         verifiedUser.ID,
+			Email:      verifiedUser.Email,
+			VerifiedAt: verifiedUser.VerifiedAt,
+			CreatedAt:  verifiedUser.CreatedAt,
+			UpdatedAt:  verifiedUser.UpdatedAt,
 		},
 	}, nil
 }

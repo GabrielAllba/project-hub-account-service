@@ -204,6 +204,46 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/users/verify": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Mark a user as verified",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Verify a user",
+                "responses": {
+                    "200": {
+                        "description": "User verified successfully",
+                        "schema": {
+                            "$ref": "#/definitions/response.VerifyUserResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.VerifyUserResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/response.VerifyUserResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -220,6 +260,9 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "updated_at": {
+                    "type": "string"
+                },
+                "verified_at": {
                     "type": "string"
                 }
             }
@@ -303,6 +346,17 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "errorSchema": {
+                    "$ref": "#/definitions/schema.ErrorSchema"
+                },
+                "outputSchema": {
+                    "$ref": "#/definitions/entity.User"
+                }
+            }
+        },
+        "response.VerifyUserResponse": {
+            "type": "object",
+            "properties": {
+                "error_schema": {
                     "$ref": "#/definitions/schema.ErrorSchema"
                 },
                 "outputSchema": {
